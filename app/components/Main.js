@@ -1,8 +1,24 @@
 import React, {Component} from 'react';
-import {AppRegistry,StyleSheet, Text, View, TextInput, ScrollView ,TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, View, TextInput, ScrollView ,TouchableOpacity} from 'react-native';
+import Note from './Note';
 
 export default class Main extends Component {
+
+  constructor(props){
+    super(props);
+    this.state = {
+        noteArray : [],
+        noteText : ''
+    }
+  }
+
   render() {
+      let notes = this.state.noteArray.map((val,key)=>{
+          return <Note key = {key} keyval =  {key} val = {val}
+                deleteMethod = {() => this.deleteNote(key)}
+           />
+      });
+     
     return (
 
         <View style={styles.container}>
@@ -10,28 +26,54 @@ export default class Main extends Component {
                 <Text style={styles.headerText}>Notes</Text>
             </View>
             <ScrollView style={styles.scrollContainer}>
-
+                {notes}
             </ScrollView>
+
             <View style={styles.footer}>
                 <TextInput 
+                    style={styles.textInput}
                     placeholder="Add note"
+                    onChangeText={(noteText) => this.setState({noteText})}
                     placeholderTextColor="white"
-                    style={styles.textinput}
                     underlineColorAndroid="transparent"
+                    value = {this.state.noteText}
                 >
-
                 </TextInput>
             </View>
-            <TouchableOpacity style={styles.addButton}>
+            <TouchableOpacity onPress={this.addNote.bind(this)} style={styles.addButton}>
                 <Text style={styles.addButtonText}>+</Text>
             </TouchableOpacity>
       </View>
     );
   }
+
+addNote(){
+    if(this.state.noteText){
+        var d = new Date();
+        this.state.noteArray.push({
+            'date' :d.getFullYear() + "/" + (d.getMonth() + 1) + "/" + d.getDate(),
+            'note' :this.state.noteText
+      });
+        this.setState({noteArray : this.state.noteArray})
+        this.setState({noteText:''})
+    }
+}
+
+deleteNote(key){
+
+    this.state.noteArray.splice(key, 1);
+    this.setState({noteArray: this.state.noteArray});
+
+}
+
+
 }
 
 const styles = StyleSheet.create({
-        header: {
+    container: {
+        flex: 1,
+    },
+    header: {
         backgroundColor: '#E91E63',
         alignItems: 'center',
         justifyContent:'center',
@@ -45,7 +87,7 @@ const styles = StyleSheet.create({
     },
     scrollContainer: {
         flex: 1,
-        marginBottom: 100,
+        marginBottom: 100
     },
     footer: {
         position: 'absolute',
@@ -54,7 +96,7 @@ const styles = StyleSheet.create({
         right: 0,
         zIndex: 10
     },
-    textinput: {
+    textInput: {
         alignSelf: 'stretch',
         color: '#fff',
         padding: 20,
@@ -80,5 +122,3 @@ const styles = StyleSheet.create({
         fontSize: 24
     }
 });
-
-AppRegistry.registerComponent('Main', () => Main);
